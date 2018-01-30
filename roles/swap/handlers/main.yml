@@ -1,0 +1,7 @@
+- name: activate swap
+  command: swapon -a
+
+- name: reset sysctl
+  service:
+    name: systemd-sysctl
+    state: restarted

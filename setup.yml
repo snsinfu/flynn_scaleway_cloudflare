@@ -1,0 +1,10 @@
+- hosts: flynn
+
+  become: yes
+
+  roles:
+    - security
+    - swap
+    - zfs
+    - docker
+    - flynn

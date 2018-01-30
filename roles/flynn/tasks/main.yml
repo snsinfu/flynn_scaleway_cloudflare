@@ -1,0 +1,62 @@
+- name: installer is downloaded
+  get_url:
+    url: https://dl.flynn.io/install-flynn
+    dest: ./
+    mode: u+x
+  become: no
+
+- name: host service is installed
+  command: ./install-flynn --clean --yes
+  args:
+    creates: /etc/systemd/system/multi-user.target.wants/flynn-host.service
+
+- name: host service is started
+  service:
+    name: flynn-host
+    state: started
+    enabled: yes
+
+# The bootstrap process assumes the cluster domain resolves to a working flynn
+# server.
+- name: cluster domain is registered to the hosts file
+  lineinfile:
+    path: /etc/hosts
+    line: 127.0.0.1 {{ cluster_domain }}
+    state: present
+
+- name: certificates are pushed to the remote
+  copy:
+    src: "{{ item }}"
+    dest: ./
+  with_items:
+    - ca.cert
+    - server.cert
+    - server.key
+  become: no
+
+- name: bootstrap is done
+  shell: >
+    CLUSTER_DOMAIN={{ cluster_domain }}
+    TLS_CA="$(cat ca.cert)"
+    TLS_CERT="$(cat server.cert)"
+    TLS_KEY="$(cat server.key)"
+    flynn-host bootstrap
+  args:
+    creates: /var/lib/flynn/image
+
+# This key should be passed to `flynn cluster add` command on a client.
+- name: controller key is extracted
+  shell: >
+    flynn-host inspect $(flynn-host ps |
+                         awk '/controller/ && /worker/ { print $1 }') |
+    awk '/AUTH_KEY/ { print $2 }' > flynn-controller.key
+  args:
+    creates: flynn-controller.key
+  become: no
+
+- name: controller key is pulled back
+  fetch:
+    src: flynn-controller.key
+    dest: ./
+    flat: yes
+  become: no

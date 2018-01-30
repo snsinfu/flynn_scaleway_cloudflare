@@ -1,0 +1,36 @@
+- name: ssh-users group is present
+  group:
+    name: ssh-users
+    state: present
+
+- name: deploy user is present
+  user:
+    name: "{{ deploy_user }}"
+    groups: sudo,ssh-users
+    shell: /bin/bash
+    state: present
+
+- name: deploy user is a password-less sudoer
+  lineinfile:
+    path: /etc/sudoers
+    line: "{{ deploy_user }} ALL=(ALL) NOPASSWD: ALL"
+    state: present
+
+- name: current sshd pubkey is read
+  slurp:
+    src: /root/.ssh/authorized_keys
+  register: authorized_keys
+
+- name: deploy user uses the same key
+  authorized_key:
+    user: "{{ deploy_user }}"
+    key: "{{ authorized_keys['content'] | b64decode }}"
+
+- name: sshd_config is up to date
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+  notify:
+    - async restart sshd
+
+- meta: flush_handlers

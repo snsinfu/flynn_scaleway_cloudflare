@@ -1,0 +1,35 @@
+- set_fact:
+    swapfile_path: /var/swapfile
+
+- name: swapfile is present
+  copy:
+    content: ""
+    dest: "{{ swapfile_path }}"
+    force: no
+    owner: root
+    mode: 0600
+  register: swapfile
+
+- name: swapfile has the desired size
+  command: dd if=/dev/zero of={{ swapfile_path }} bs=1M count=2048
+  when: swapfile | changed
+
+- name: swapfile is formatted as a swap
+  command: mkswap {{ swapfile_path }}
+  when: swapfile | changed
+
+- name: swapfile is registered to fstab
+  lineinfile:
+    dest: /etc/fstab
+    line: "{{ swapfile_path }} none swap sw 0 0"
+  notify:
+    - activate swap
+
+- name: kernel parameters are configured
+  copy:
+    content: vm.swappiness = 10
+    dest: /etc/sysctl.d/60-swap.conf
+  notify:
+    - reset sysctl
+
+- meta: flush_handlers

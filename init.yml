@@ -1,0 +1,10 @@
+- hosts: all
+
+  vars:
+    - ansible_user: root
+    - ansible_port: 22
+    - deploy_user: "{{ hostvars[inventory_hostname].ansible_user }}"
+    - deploy_port: "{{ hostvars[inventory_hostname].ansible_port }}"
+
+  roles:
+    - init

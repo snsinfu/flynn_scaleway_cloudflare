@@ -1,0 +1,8 @@
+.terraform
+*.retry
+*.tfstate
+.env
+hosts
+server.cert
+server.key
+flynn-controller.key

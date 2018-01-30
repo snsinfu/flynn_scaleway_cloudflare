@@ -1,0 +1,6 @@
+- name: async restart sshd
+  service:
+    name: sshd
+    state: restarted
+  async: 1
+  poll: 0

@@ -1,0 +1,47 @@
+#!/bin/sh
+set -eu
+
+PIF={{ ansible_default_ipv4.interface }}
+SSH={{ ansible_ssh_port }}
+HTTPS=443
+MOSH=60000:60001
+
+iptables -P INPUT   ACCEPT
+iptables -P OUTPUT  ACCEPT
+iptables -P FORWARD ACCEPT
+
+for chain in filter nat mangle raw security; do
+    iptables -t $chain -F
+    iptables -t $chain -X
+done
+
+# Always track connections so that ssh does not hang on restarting firewall.
+iptables -A INPUT  -j ACCEPT -m state --state NEW
+iptables -A OUTPUT -j ACCEPT -m state --state NEW
+
+case "$1" in
+close) ;;
+open)  exit 0
+esac
+
+iptables -P INPUT   DROP
+iptables -P OUTPUT  ACCEPT
+iptables -P FORWARD DROP
+
+iptables -F
+iptables -A INPUT -j ACCEPT -i lo
+iptables -A INPUT -j ACCEPT -m state --state ESTABLISHED,RELATED
+
+# https://github.com/flynn/flynn/issues/3259#issuecomment-239027461
+iptables -A INPUT   -j ACCEPT -i flynnbr0
+iptables -A FORWARD -j ACCEPT -i flynnbr0
+iptables -A INPUT   -j ACCEPT -i flannel.1
+iptables -A FORWARD -j ACCEPT -i flannel.1
+iptables -A INPUT   -j ACCEPT -i veth+
+iptables -A FORWARD -j ACCEPT -i veth+
+
+# Allowed inbound packets:
+iptables -A INPUT -j ACCEPT -p icmp                      -i $PIF
+iptables -A INPUT -j ACCEPT -p tcp -m tcp --dport $SSH   -i $PIF -m state --state NEW
+iptables -A INPUT -j ACCEPT -p udp -m udp --dport $MOSH  -i $PIF -m state --state NEW
+iptables -A INPUT -j ACCEPT -p tcp -m tcp --dport $HTTPS -i $PIF -m state --state NEW

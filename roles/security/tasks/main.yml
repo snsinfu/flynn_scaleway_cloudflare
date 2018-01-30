@@ -1,0 +1,38 @@
+- name: apt database is up to date
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: system is up to date
+  apt:
+    upgrade: dist
+    autoclean: yes
+    autoremove: yes
+
+- name: sysctl configuration is pushed to the remote
+  copy:
+    src: 60-network.conf
+    dest: /etc/sysctl.d/
+  notify:
+    - reset sysctl
+
+- name: firewall service is pushed to the remote
+  copy:
+    src: firewall.service
+    dest: /etc/systemd/system/
+
+- name: firewall script is pushed to the remote
+  template:
+    src: firewall.sh.j2
+    dest: /etc/firewall.sh
+    mode: u+x
+  notify:
+    - restart firewall
+
+- name: firewall is enabled
+  service:
+    name: firewall
+    state: started
+    enabled: yes
+
+- meta: flush_handlers
