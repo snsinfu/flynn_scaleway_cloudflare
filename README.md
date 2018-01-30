@@ -72,7 +72,7 @@ This will:
 Calculate the certificate pin:
 
 ```
-CERT_PIN=$(openssl x509 -inform PEM -outform DER < roles/flynn/file/server.cert | openssl dgst -binary -sha256 | openssl base64)
+CERT_PIN=$(openssl x509 -inform PEM -outform DER < roles/flynn/files/server.cert | openssl dgst -binary -sha256 | openssl base64)
 ```
 
 Then do this:
