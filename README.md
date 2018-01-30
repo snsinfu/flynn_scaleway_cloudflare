@@ -36,7 +36,7 @@ Go to your Cloudflare Crypto dashboard and generate an origin certificate for
 *.flynn.example.com. Save the certificate as server.cert and the private key
 as server.key in roles/flynn/files directory.
 
-## 3. Init the server
+## 4. Init the server
 
 Run
 
@@ -50,7 +50,7 @@ This will configure the server to:
 - Disallow root login
 - Create a user named ansible\_user, which ssh login is allowed for
 
-## 4. Setup flynn
+## 5. Setup flynn
 
 Run
 
@@ -67,7 +67,7 @@ This will:
 - Install single-node Flynn
 - Retrieve controller key into flynn-controller.key file
 
-## 5. Connect to Flynn
+## 6. Connect to Flynn
 
 Calculate the certificate pin:
 
@@ -81,7 +81,7 @@ Then do this:
 flynn cluster add -p ${CERT_PIN} default flynn.example.com $(cat flynn-controller.key)
 ```
 
-## 6. Publish an app
+## 7. Publish an app
 
 Create a Flynn app and add a route:
 
