@@ -1,0 +1,8 @@
+# Forbid ICMP redirects
+net.ipv4.conf.{{ ansible_default_ipv4.interface }}.accept_redirects = 0
+net.ipv4.conf.{{ ansible_default_ipv4.interface }}.secure_redirects = 0
+net.ipv4.conf.{{ ansible_default_ipv4.interface }}.send_redirects = 0
+
+# Forbid spoofed packets
+net.ipv4.conf.{{ ansible_default_ipv4.interface }}.rp_filter = 1
+net.ipv4.conf.{{ ansible_default_ipv4.interface }}.forwarding = 0

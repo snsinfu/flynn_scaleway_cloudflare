@@ -10,9 +10,9 @@
     autoremove: yes
 
 - name: sysctl configuration is pushed to the remote
-  copy:
-    src: 60-network.conf
-    dest: /etc/sysctl.d/
+  template:
+    src: 60-network.conf.j2
+    dest: /etc/sysctl.d/60-network.conf
   notify:
     - reset sysctl
 
