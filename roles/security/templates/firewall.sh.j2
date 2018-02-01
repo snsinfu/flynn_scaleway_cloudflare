@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-PIF={{ ansible_default_ipv4.interface }}
+PIF={{ public_interface }}
 SSH={{ ansible_ssh_port }}
 HTTP=80
 HTTPS=443

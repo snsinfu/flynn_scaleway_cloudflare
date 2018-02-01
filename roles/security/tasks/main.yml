@@ -1,3 +1,7 @@
+- name: public interface is detected
+  set_fact:
+    public_interface: "{{ ansible_default_ipv4.interface }}"
+
 - name: apt database is up to date
   apt:
     update_cache: yes
