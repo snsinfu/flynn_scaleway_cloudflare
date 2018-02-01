@@ -50,8 +50,6 @@
     flynn-host inspect $(flynn-host ps |
                          awk '/controller/ && /worker/ { print $1 }') |
     awk '/AUTH_KEY/ { print $2 }' > flynn-controller.key
-  args:
-    creates: flynn-controller.key
   become: no
 
 - name: controller key is pulled back
