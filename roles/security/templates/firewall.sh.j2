@@ -3,6 +3,7 @@ set -eu
 
 PIF={{ ansible_default_ipv4.interface }}
 SSH={{ ansible_ssh_port }}
+HTTP=80
 HTTPS=443
 MOSH=60000:60001
 
@@ -44,4 +45,5 @@ iptables -A FORWARD -j ACCEPT -i veth+
 iptables -A INPUT -j ACCEPT -p icmp                      -i $PIF
 iptables -A INPUT -j ACCEPT -p tcp -m tcp --dport $SSH   -i $PIF -m state --state NEW
 iptables -A INPUT -j ACCEPT -p udp -m udp --dport $MOSH  -i $PIF -m state --state NEW
+iptables -A INPUT -j ACCEPT -p tcp -m tcp --dport $HTTP  -i $PIF -m state --state NEW
 iptables -A INPUT -j ACCEPT -p tcp -m tcp --dport $HTTPS -i $PIF -m state --state NEW
