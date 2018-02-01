@@ -6,5 +6,4 @@
     - security
     - swap
     - zfs
-    - docker
     - flynn
