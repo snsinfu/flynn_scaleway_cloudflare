@@ -5,4 +5,6 @@ net.ipv4.conf.{{ public_interface }}.send_redirects = 0
 
 # Forbid spoofed packets
 net.ipv4.conf.{{ public_interface }}.rp_filter = 1
-net.ipv4.conf.{{ public_interface }}.forwarding = 0
+
+# Required by flynn containers to access to the internet via NAT
+net.ipv4.conf.{{ public_interface }}.forwarding = 1
